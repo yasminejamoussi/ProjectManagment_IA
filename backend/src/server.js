@@ -15,9 +15,10 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 // Connexion à MongoDB
-mongoose.connect("mongodb://localhost:27017/projectmanagement")
-.then(() => console.log('Connected to MongoDB'))
-.catch((err) => console.error('MongoDB connection error:', err));
+const mongoUri = process.env.MONGO_URI || "mongodb://localhost:27017/projectmanagement"; // Utiliser la variable d'environnement pour MongoDB
+mongoose.connect(mongoUri)
+  .then(() => console.log('Connected to MongoDB'))
+  .catch((err) => console.error('MongoDB connection error:', err));
 
 // Routes
 app.get('/', (req, res) => {
@@ -40,7 +41,7 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-// Définir le port d'écoute (par défaut 3000)
+// Définir le port d'écoute (par défaut 4000 ou celui spécifié dans .env)
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
   console.log(`Backend is running on http://localhost:${PORT}`);
