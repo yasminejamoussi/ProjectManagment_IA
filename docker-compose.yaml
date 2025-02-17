@@ -1,15 +1,16 @@
-version: "3.8"
 services:
   api:
     build:
       context: ./backend
       dockerfile: Dockerfile
     container_name: api
+  
     ports:
       - "4000:4000"
     volumes:
       - "./backend/:/app"
       - "/app/node_modules"  # Empêche l'écrasement des dépendances
+  
 
   web:
     build:
