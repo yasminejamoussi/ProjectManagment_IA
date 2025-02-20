@@ -1,70 +1,28 @@
 pipeline {
-    agent any
-    environment {
-        NODE_ENV = 'development'
+    agent {
+        docker { image 'node:18' }  // Utiliser une image Docker Node.js
     }
     stages {
-        stage('Checkout Code') {
+        stage('Install dependencies') {
             steps {
                 script {
-                    try {
-                        sh 'git reset --hard'
-                        sh 'git clean -fd'
-                        sh 'git pull origin dev' // Remplace "main" par ta branche
-                    } catch (err) {
-                        echo "❌ Erreur lors du fetch du code: ${err}"
-                        error("Échec du checkout du code")
-                    }
+                    sh 'npm install'
                 }
             }
         }
-
-        stage('Install Dependencies') {
+        stage('Unit Test') {
             steps {
                 script {
-                    try {
-                        sh 'npm install'
-                    } catch (err) {
-                        echo "❌ Erreur lors de npm install: ${err}"
-                        error("Échec de l'installation des dépendances")
-                    }
+                    sh 'npm test'
                 }
             }
         }
-
-        stage('Run Unit Tests') {
+        stage('Build application') {
             steps {
                 script {
-                    try {
-                        sh 'npm test'
-                    } catch (err) {
-                        echo "❌ Tests échoués: ${err}"
-                        error("Les tests unitaires ont échoué")
-                    }
+                    sh 'npm run build-dev'
                 }
             }
-        }
-
-        stage('Build Application') {
-            steps {
-                script {
-                    try {
-                        sh 'npm run build-dev'
-                    } catch (err) {
-                        echo "❌ Erreur lors du build: ${err}"
-                        error("Échec de la construction de l'application")
-                    }
-                }
-            }
-        }
-    }
-
-    post {
-        success {
-            echo "🎉 Build réussi !"
-        }
-        failure {
-            echo "💥 Le build a échoué, vérifie les logs."
         }
     }
 }
