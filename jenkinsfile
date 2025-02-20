@@ -6,8 +6,6 @@ pipeline{
         registry = "192.168.33.10:8083"
     }
   stages {
-
-   stages {
         stage('Install Frontend Dependencies') {
             steps{
                 script {
