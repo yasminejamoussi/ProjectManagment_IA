@@ -1,26 +1,28 @@
 pipeline {
-    agent any
-    
+    agent any  // Utiliser l'agent Jenkins générique
     stages {
         stage('Install dependencies') {
+            agent {
+                docker { image 'node:18' }
+            }
             steps {
-                script {
-                    sh 'npm install'
-                }
+                sh 'npm install'
             }
         }
         stage('Unit Test') {
+            agent {
+                docker { image 'node:18' }
+            }
             steps {
-                script {
-                    sh 'npm test'
-                }
+                sh 'npm test'
             }
         }
         stage('Build application') {
+            agent {
+                docker { image 'node:18' }
+            }
             steps {
-                script {
-                    sh 'npm run build-dev'
-                }
+                sh 'npm run build-dev'
             }
         }
     }
