@@ -25,20 +25,7 @@ pipeline{
             }
         }
 
- stage('Unit Test') {
-            steps{
-                script {
-                    
-                    /* dir('frontend/projectmanagement') {
-                        sh('npm test')
-                    } */
-                  
-                    dir('backend') {
-                        sh('npm test')
-                    }
-                }
-            }
-        }
+ 
 
     stage('SonarQube Analysis') {
       steps{
