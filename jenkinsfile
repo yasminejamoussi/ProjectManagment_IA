@@ -1,29 +1,47 @@
-pipeline {
-    agent any  // Utiliser l'agent Jenkins générique
-    stages {
-        stage('Install dependencies') {
-            agent {
-                docker { image 'node:18' }
-            }
-            steps {
-                sh 'npm install'
-            }
+
+pipeline{
+  agent any
+
+  stages {
+
+  stage('Install dependencies') {
+      steps{
+        
+        script {
+         sh('npm install')
         }
-        stage('Unit Test') {
-            agent {
-                docker { image 'node:18' }
-            }
-            steps {
-                sh 'npm test'
-            }
-        }
-        stage('Build application') {
-            agent {
-                docker { image 'node:18' }
-            }
-            steps {
-                sh 'npm run build-dev'
-            }
-        }
+      }
     }
+
+stage('Unit Test') {
+      steps{
+        
+        script {
+         sh('npm test')
+        }
+      }
+    }
+
+    stage('SonarQube Analysis') {
+      steps{
+      script {  
+                    def scannerHome = tool 'scanner'
+                    withSonarQubeEnv {
+                    sh "${scannerHome}/bin/sonar-scanner"
+                        }
+                } 
+              }  
+            }
+
+stage('Build application') {
+      steps{
+        
+        script {
+         sh('npm run build-dev')
+        }
+      }
+    }
+  } 
+
 }
+
