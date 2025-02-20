@@ -1,8 +1,8 @@
 // backend/controllers/userController.test.js
 const request = require('supertest');
-const app = require('./src/server');  // Assurez-vous que votre app Express est exportée correctement
+const app = require('../src/server');  // Assurez-vous que votre app Express est exportée correctement
 const mongoose = require('mongoose');
-const User = require('./src/models/User');  // Modèle utilisateur
+const User = require('../src/models/User');  // Modèle utilisateur
 const dotenv = require('dotenv');
 
 // Charger les variables d'environnement spécifiques aux tests
