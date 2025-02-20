@@ -1,26 +1,70 @@
-pipeline{
-agent any
-stages {
-stage('Install dependencies') {
-steps{
-script {
-sh('npm install')
-}
-}
-}
-stage('Unit Test') {
-steps{
-script {
-sh('npm test')
-}
-}
-}
-stage('Build application') {
-steps{
-script {
-sh('npm run build-dev')
-}
-}
-}
-}
+pipeline {
+    agent any
+    environment {
+        NODE_ENV = 'development'
+    }
+    stages {
+        stage('Checkout Code') {
+            steps {
+                script {
+                    try {
+                        sh 'git reset --hard'
+                        sh 'git clean -fd'
+                        sh 'git pull origin dev' // Remplace "main" par ta branche
+                    } catch (err) {
+                        echo "❌ Erreur lors du fetch du code: ${err}"
+                        error("Échec du checkout du code")
+                    }
+                }
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                script {
+                    try {
+                        sh 'npm install'
+                    } catch (err) {
+                        echo "❌ Erreur lors de npm install: ${err}"
+                        error("Échec de l'installation des dépendances")
+                    }
+                }
+            }
+        }
+
+        stage('Run Unit Tests') {
+            steps {
+                script {
+                    try {
+                        sh 'npm test'
+                    } catch (err) {
+                        echo "❌ Tests échoués: ${err}"
+                        error("Les tests unitaires ont échoué")
+                    }
+                }
+            }
+        }
+
+        stage('Build Application') {
+            steps {
+                script {
+                    try {
+                        sh 'npm run build-dev'
+                    } catch (err) {
+                        echo "❌ Erreur lors du build: ${err}"
+                        error("Échec de la construction de l'application")
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "🎉 Build réussi !"
+        }
+        failure {
+            echo "💥 Le build a échoué, vérifie les logs."
+        }
+    }
 }
