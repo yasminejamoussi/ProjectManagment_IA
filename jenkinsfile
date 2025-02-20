@@ -47,15 +47,7 @@ pipeline{
                 }
             }
         }
-        stage('Build Backend') {
-            steps {
-                script {
-                    dir('backend') {
-                        sh('npm run build') // Adjust if needed for Node.js build
-                    }
-                }
-            }
-        }
+        
     stage('Building images (node and mongo)') {
 steps{
 script {
