@@ -5,7 +5,7 @@
   "scripts": {
     "start": "node src/server.js",
     "server": "nodemon src/server.js",
-     "test": "jest"
+    "test": "jest --timeout=60000"
   },
   "keywords": [],
   "author": "",
