@@ -38,14 +38,24 @@ pipeline{
               }  
             }
 
-stage('Build application') {
-      steps{
-        
-        script {
-         sh('npm run build-dev')
+ stage('Build Frontend') {
+            steps {
+                script {
+                    dir('frontend/projectmanagement') {
+                        sh('npm run build') // Make sure build script is available
+                    }
+                }
+            }
         }
-      }
-    }
+        stage('Build Backend') {
+            steps {
+                script {
+                    dir('backend') {
+                        sh('npm run build') // Adjust if needed for Node.js build
+                    }
+                }
+            }
+        }
     stage('Building images (node and mongo)') {
 steps{
 script {
