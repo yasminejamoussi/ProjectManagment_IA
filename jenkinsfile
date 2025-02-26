@@ -1,0 +1,99 @@
+pipeline {
+    agent any
+
+    environment {
+        registryCredentials = "nexus" // ID des informations d'identification Nexus dans Jenkins
+        registry = "192.168.33.10:8083" // Adresse du registre Nexus
+    }
+
+    stages {
+        stage('Install Frontend Dependencies') {
+            steps {
+                script {
+                    dir('frontend/projectmanagement') {
+                        sh 'npm install'
+                    }
+                }
+            }
+        }
+
+        stage('Install Backend Dependencies') {
+            steps {
+                script {
+                    dir('backend') {
+                        sh 'npm install'
+                    }
+                }
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                script {
+                    def scannerHome = tool 'scanner' // Assurez-vous que 'scanner' est configuré dans Jenkins
+                    withSonarQubeEnv {
+                        sh "${scannerHome}/bin/sonar-scanner"
+                    }
+                }
+            }
+        }
+
+        stage('Build Frontend') {
+            steps {
+                script {
+                    dir('frontend/projectmanagement') {
+                        sh 'npm run build'
+                    }
+                }
+            }
+        }
+
+        stage('Building images (api, web, and mongo)') {
+            steps {
+                script {
+                    sh 'docker-compose build'
+                }
+            }
+        }
+
+        stage('Tag Docker Images') {
+            steps {
+                script {
+                    // Tagger les images localement construites avec le registre Nexus
+                    sh "docker tag api ${registry}/api:6.0"
+                    sh "docker tag web ${registry}/web:6.0"
+                }
+            }
+        }
+
+        stage('Deploy to Nexus') {
+            steps {
+                script {
+                    docker.withRegistry("http://${registry}", registryCredentials) {
+                        // Pousser les images taguées vers Nexus
+                        sh "docker push ${registry}/api:6.0"
+                        sh "docker push ${registry}/web:6.0"
+                    }
+                }
+            }
+        }
+
+        stage('Run application') {
+            steps {
+                script {
+                    // Utiliser docker-compose pour démarrer les services
+                    sh 'docker-compose up -d'
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Pipeline exécuté avec succès !'
+        }
+        failure {
+            echo 'Le pipeline a échoué. Veuillez vérifier les logs pour plus de détails.'
+        }
+    }
+}
